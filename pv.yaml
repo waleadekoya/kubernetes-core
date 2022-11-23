@@ -5,7 +5,7 @@ metadata:
   labels:
     app: airflow-logs
 spec:
-  storageClassName: manual
+  storageClassName: standard
 
   capacity:
     storage: 20Gi
