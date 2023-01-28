@@ -19,8 +19,10 @@ Ensure to install the latest version of `kubectl` and `kind`
 Install Apache Airflow on Local Kubernetes Cluster using Helm & Kind
 1. Create a Local Kubernetes Cluster with Kind
    - `kind create cluster --name airflow-cluster --config kind-cluster.yaml`
-   - `kubectl cluster-info`
+   - Interact with the cluster: `kubectl cluster-info --context kind-airflow-cluster`
    - `kubectl get nodes -o wide`
+   - Get a list of clusters: `kind get clusters`
+   - Get a list of images present on a cluster: `docker exec -it <node-name/docker-container> crictl images`
 2. Deploy Airflow on the Kubernetes Cluster
    - `kubectl create namespace airflow`
    - `kubectl get namespaces`
@@ -61,6 +63,16 @@ Install Apache Airflow on Local Kubernetes Cluster using Helm & Kind
 7. Enable Logs with Airflow on Kubernetes 
    - `kubectl exec -it airflow-worker-0 -- /bin/bash`
 8. Rollback to a previous working release `helm rollback <release> airflow <revision no> 3 -n airflow`
-9. To clean up use: 
+9. Run commands against a pod:
+   - shell into pod `kubectl -n airflow exec -it <pod-name> sh`
+   - run any command directly on the pod: `kubectl -n airflow exec <pod-name> -- ls`
+10. Useful kubectl commands
+  - `kubectl port-forward svc/<servic-name> <node-port>:<host-port> -n namespace`
+  - `kubectl get pods -n namespace --show-labels`
+  - `kubectl describe replicaset <pod-name> -n namespace` OR `kubectl describe rs <pod-name> -n namespace`
+  - `kubectl get all -n namespace --show-labels`
+  - `kubectl get ns` get all namespaces defined on the k8s system
+  - `kubectl logs <pod-name>` - emits the application system logs: add `-f` to freeze the console and follow the logs
+11. To clean up use: 
   - `helm delete airflow --namespace airflow`
   - `docker image rm -f airflow-docker-image-id`

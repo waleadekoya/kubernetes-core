@@ -1,11 +1,27 @@
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
+#networking:
+#  ipFamily: ipv6
+#  apiServerAddress: 127.0.0.1
 containerdConfigPatches:
   - |-
     [plugins."io.containerd.grpc.v1.cri".registry.mirrors."localhost:${reg_port}"]
       endpoint = ["http://${reg_name}:${reg_port}"]
 nodes:
   - role: control-plane
+    extraPortMappings: # allows localhost:30070 to access the service mapped to this port without port forwarding
+      - containerPort: 30070
+        hostPort: 30070  # ensure the NodePort is mapped to the same container port
+        listenAddress: "0.0.0.0" # Optional, defaults to "0.0.0.0"
+        protocol: tcp  # Optional, defaults to tcp
+      - containerPort: 30010
+        hostPort: 30010  # ensure the NodePort is mapped to the same container port
+        listenAddress: "0.0.0.0"
+        protocol: tcp
+      - containerPort: 30020
+        hostPort: 30020  # ensure the NodePort is mapped to the same container port
+        listenAddress: "0.0.0.0"
+        protocol: tcp
   - role: worker
     kubeadmConfigPatches:
       - |

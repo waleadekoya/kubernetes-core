@@ -1,0 +1,80 @@
+apiVersion: v1
+kind: Service
+metadata:
+  # Unique key of the Service instance
+  name: fleetman-webapp
+spec:
+  # This defines which pods are going to be represented by this Service
+  # The service becomes a network endpoint for either other services
+  # or maybe external users to connect to (e.g. a browser)
+  selector:
+    # Load balance traffic across Pods matching this label selector
+    # This defines which pods are going to be represented by this Service
+    # The service becomes a network endpoint for either other services
+    # or external users to connect to (e.g. browser)
+    app: webapp
+#    release: "0-5"
+  ports:
+    - name: http  # this is just a label
+      port: 80
+      nodePort: 30070  # port on the container (MUST be greater than 30000)
+  type: NodePort  # NodePort (node-based) or ClusterIP (default) or LoadBalancer (accessible to external traffic) only for cloud-based clusters (i.e. AWS)
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fleetman-queue
+spec:
+  selector:
+    app: queue
+  ports:
+    - name: http
+      port: 8161
+      nodePort: 30010
+
+    - name: endpoint
+      port: 61616
+  type: NodePort
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fleetman-position-tracker
+spec:
+  selector:
+    app: position-tracker
+  ports:
+    - name: http
+      port: 8080
+#      nodePort: 30030
+  type: ClusterIP  # limits network traffic to only the pods in the cluster
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fleetman-api-gateway
+spec:
+  selector:
+    app: api-gateway
+  ports:
+    - name: http
+      port: 8080
+      nodePort: 30020
+  type: NodePort
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: fleetman-mongodb
+spec:
+  selector:
+    app: mongodb
+  ports:
+    - name: mongoport
+      port: 27017
+  type: ClusterIP
